@@ -1,0 +1,102 @@
+,raw_id,customer_id,full_name,email,address_raw,lat,lon,segment_tag,ingested_at,source_system
+0,0,C-WAW-CUST-01,Adam Nowak,adam.nowak@example.com,ul. Chmielna 15,52.2321,21.0150,VIP,2026-01-06 10:15:00,Mobile_App_Database
+1,1,C-WAW-CUST-02,Ewa Kowalska,ewa.kowalska@example.com,ul. Krucza 46,52.2285,21.0182,Regular,2026-01-06 10:15:00,Mobile_App_Database
+2,2,C-WAW-CUST-03,Marek Wiśniewski,m.wisniewski@example.com,ul. Nowy Swiat 22,52.2340,21.0195,New,2026-01-06 10:15:00,Mobile_App_Database
+3,3,C-WAW-CUST-04,Anna Wójcik,a.wojcik@example.com,ul. Hoza 10,52.2260,21.0130,Regular,2026-01-06 10:15:00,Mobile_App_Database
+4,4,C-WAW-CUST-05,Piotr Mazur,p.mazur@example.com,ul. Mokotowska 45,52.2220,21.0210,VIP,2026-01-06 10:15:00,Mobile_App_Database
+5,5,C-WAW-CUST-06,Zofia Kamińska,z.kaminska@example.com,ul. Wilcza 2,52.2245,21.0250,Regular,2026-01-06 10:15:00,Mobile_App_Database
+6,6,C-WAW-CUST-07,Michał Lewandowski,m.lewandowski@example.com,ul. Zelazna 50,52.2355,20.9890,New,2026-01-06 10:15:00,Mobile_App_Database
+7,7,C-WAW-CUST-08,Katarzyna Zielińska,k.zielinska@example.com,ul. Grójecka 40,52.2180,20.9820,Regular,2026-01-06 10:15:00,Mobile_App_Database
+8,8,C-WAW-CUST-09,Tomasz Szymański,t.szymanski@example.com,ul. Puławska 12,52.2130,21.0220,VIP,2026-01-06 10:15:00,Mobile_App_Database
+9,9,C-WAW-CUST-10,Monika Woźniak,m.wozniak@example.com,ul. Targowa 66,52.2530,21.0350,New,2026-01-06 10:15:00,Mobile_App_Database
+10,10,C-WAW-CUST-11,Jakub Dąbrowski,j.dabrowski@example.com,ul. Koszykowa 15,52.2215,21.0110,Regular,2026-01-06 10:15:00,Mobile_App_Database
+11,11,C-WAW-CUST-12,Magdalena Kozłowska,m.kozlowska@example.com,ul. Bagatela 10,52.2140,21.0235,VIP,2026-01-06 10:15:00,Mobile_App_Database
+12,12,C-WAW-CUST-13,Łukasz Jankowski,l.jankowski@example.com,ul. Emilii Plater 25,52.2270,21.0040,Regular,2026-01-06 10:15:00,Mobile_App_Database
+13,13,C-WAW-CUST-14,Natalia Wojciechowska,n.wojciechowska@example.com,ul. Sienna 45,52.2305,20.9980,New,2026-01-06 10:15:00,Mobile_App_Database
+14,14,C-WAW-CUST-15,Marcin Kwiatkowski,m.kwiatkowski@example.com,ul. Tamka 30,52.2370,21.0280,Regular,2026-01-06 10:15:00,Mobile_App_Database
+15,15,C-WAW-CUST-16,Aleksandra Kaczmarek,a.kaczmarek@example.com,ul. Dobra 15,52.2410,21.0260,New,2026-01-06 10:15:00,Mobile_App_Database
+16,16,C-WAW-CUST-17,Grzegorz Piotrowski,g.piotrowski@example.com,ul. Francuska 12,52.2345,21.0610,VIP,2026-01-06 10:15:00,Mobile_App_Database
+17,17,C-WAW-CUST-18,Marta Grabowska,m.grabowska@example.com,ul. Zlota 7,52.2315,21.0090,Regular,2026-01-06 10:15:00,Mobile_App_Database
+18,18,C-WAW-CUST-19,Robert Pawłowski,r.pawlowski@example.com,ul. Belwederska 20,52.2080,21.0290,Regular,2026-01-06 10:15:00,Mobile_App_Database
+19,19,C-WAW-CUST-20,Karolina Michalska,k.michalska@example.com,ul. Filtrowa 62,52.2200,20.9880,New,2026-01-06 10:15:00,Mobile_App_Database
+20,20,C-WAW-CUST-21,Krzysztof Nowicki,k.nowicki@example.com,ul. Jana Pawla II 30,52.2380,20.9950,VIP,2026-01-06 10:15:00,Mobile_App_Database
+21,21,C-WAW-CUST-22,Paulina Adamczyk,p.adamczyk@example.com,ul. Twarda 4,52.2330,21.0010,Regular,2026-01-06 10:15:00,Mobile_App_Database
+22,22,C-WAW-CUST-23,Dariusz Dudek,d.dudek@example.com,ul. Solec 100,52.2310,21.0370,New,2026-01-06 10:15:00,Mobile_App_Database
+23,23,C-WAW-CUST-24,Beata Zając,b.zajac@example.com,ul. Czerniakowska 150,52.2150,21.0450,Regular,2026-01-06 10:15:00,Mobile_App_Database
+24,24,C-WAW-CUST-25,Mariusz Król,m.krol@example.com,ul. Bonifraterska 1,52.2535,21.0075,VIP,2026-01-06 10:15:00,Mobile_App_Database
+25,25,C-WAW-CUST-26,Joanna Wieczorek,j.wieczorek@example.com,ul. Domaniewska 35,52.1890,21.0015,Regular,2026-01-06 10:15:00,Mobile_App_Database
+26,26,C-WAW-CUST-27,Rafał Majewski,r.majewski@example.com,ul. Gagarina 5,52.2075,21.0360,New,2026-01-06 10:15:00,Mobile_App_Database
+27,27,C-WAW-CUST-28,Małgorzata Wróbel,m.wrobel@example.com,ul. Spacerowa 10,52.2110,21.0265,Regular,2026-01-06 10:15:00,Mobile_App_Database
+28,28,C-WAW-CUST-29,Wojciech Stępień,w.stepien@example.com,ul. Nowowiejska 20,52.2195,21.0095,VIP,2026-01-06 10:15:00,Mobile_App_Database
+29,29,C-WAW-CUST-30,Ewelina Dudzińska,e.dudzinska@example.com,ul. Rakowiecka 30,52.2090,21.0100,New,2026-01-06 10:15:00,Mobile_App_Database
+30,30,C-WAW-CUST-31,Sebastian Adamczyk,s.adamczyk@example.com,ul. Madalinskiego 15,52.2045,21.0115,Regular,2026-01-06 10:15:00,Mobile_App_Database
+31,31,C-WAW-CUST-32,Iwona Sikora,i.sikora@example.com,ul. Goraszewska 10,52.1870,21.0580,Regular,2026-01-06 10:15:00,Mobile_App_Database
+32,32,C-WAW-CUST-33,Andrzej Baran,a.baran@example.com,ul. Okrezna 5,52.1830,21.0620,New,2026-01-06 10:15:00,Mobile_App_Database
+33,33,C-WAW-CUST-34,Aneta Rutkowska,a.rutkowska@example.com,ul. Jagiellonska 10,52.2515,21.0295,Regular,2026-01-06 10:15:00,Mobile_App_Database
+34,34,C-WAW-CUST-35,Paweł Michalski,p.michalski@example.com,ul. Radzyminska 20,52.2570,21.0480,VIP,2026-01-06 10:15:00,Mobile_App_Database
+35,35,C-WAW-CUST-36,Dorota Szulc,d.szulc@example.com,ul. Stalowa 15,52.2610,21.0420,Regular,2026-01-06 10:15:00,Mobile_App_Database
+36,36,C-WAW-CUST-37,Piotr Ostrowski,p.ostrowski@example.com,ul. Saska 50,52.2280,21.0650,New,2026-01-06 10:15:00,Mobile_App_Database
+37,37,C-WAW-CUST-38,Jolanta Marciniak,j.marciniak@example.com,ul. Zwyciezców 10,52.2315,21.0590,Regular,2026-01-06 10:15:00,Mobile_App_Database
+38,38,C-WAW-CUST-39,Artur Kalina,a.kalina@example.com,ul. Walecznych 5,52.2335,21.0550,VIP,2026-01-06 10:15:00,Mobile_App_Database
+39,39,C-WAW-CUST-40,Grażyna Borkowska,g.borkowska@example.com,ul. Poznanska 12,52.2275,21.0125,Regular,2026-01-06 10:15:00,Mobile_App_Database
+40,40,C-WAW-CUST-41,Szymon Lis,s.lis@example.com,ul. Pankiewicza 3,52.2290,21.0110,New,2026-01-06 10:15:00,Mobile_App_Database
+41,41,C-WAW-CUST-42,Kinga Malina,k.malina@example.com,ul. Wspólna 40,52.2270,21.0145,Regular,2026-01-06 10:15:00,Mobile_App_Database
+42,42,C-WAW-CUST-43,Filip Sawicki,f.sawicki@example.com,ul. Jasna 10,52.2350,21.0115,VIP,2026-01-06 10:15:00,Mobile_App_Database
+43,43,C-WAW-CUST-44,Maja Sokolowska,m.sokolowska@example.com,ul. Swietokrzyska 14,52.2355,21.0080,Regular,2026-01-06 10:15:00,Mobile_App_Database
+44,44,C-WAW-CUST-45,Kamil Bednarek,k.bednarek@example.com,ul. Bagno 2,52.2360,21.0045,New,2026-01-06 10:15:00,Mobile_App_Database
+45,45,C-WAW-CUST-46,Oliwia Kurek,o.kurek@example.com,ul. Chłodna 20,52.2385,20.9895,Regular,2026-01-06 10:15:00,Mobile_App_Database
+46,46,C-WAW-CUST-47,Mateusz Polak,m.polak@example.com,ul. Krochmalna 3,52.2375,20.9940,VIP,2026-01-06 10:15:00,Mobile_App_Database
+47,47,C-WAW-CUST-48,Weronika Górska,w.gorska@example.com,ul. Lucka 15,52.2325,20.9875,Regular,2026-01-06 10:15:00,Mobile_App_Database
+48,48,C-WAW-CUST-49,Igor Zawadzki,i.zawadzki@example.com,ul. Prosta 20,52.2300,20.9850,New,2026-01-06 10:15:00,Mobile_App_Database
+49,49,C-WAW-CUST-50,Agata Kowalczyk,a.kowalczyk@example.com,ul. Karolkowa 50,52.2340,20.9780,Regular,2026-01-06 10:15:00,Mobile_App_Database
+50,50,customer_id,full_name,email,address_raw,lat,lon,segment_tag,ingested_at,source_system
+51,51,C-ROM-CUST-01,Giulia Rossi,giulia.rossi@example.it,Via della Lungaretta 10,41.8895,12.4720,VIP,2026-01-06 10:20:00,Mobile_App_Database
+52,52,C-ROM-CUST-02,Luca Ferrari,l.ferrari@example.it,Piazza di Santa Maria in Trastevere,41.8899,12.4705,Regular,2026-01-06 10:20:00,Mobile_App_Database
+53,53,C-ROM-CUST-03,Sofia Russo,s.russo@example.it,Via Garibaldi 15,41.8885,12.4650,New,2026-01-06 10:20:00,Mobile_App_Database
+54,54,C-ROM-CUST-04,Francesco Esposito,f.esposito@example.it,Via del Moro 22,41.8910,12.4715,Regular,2026-01-06 10:20:00,Mobile_App_Database
+55,55,C-ROM-CUST-05,Martina Bianchi,m.bianchi@example.it,Lungotevere Raffaello Sanzio,41.8920,12.4735,VIP,2026-01-06 10:20:00,Mobile_App_Database
+56,56,C-ROM-CUST-06,Alessandro Romano,a.romano@example.it,Via dei Genovesi 30,41.8875,12.4760,Regular,2026-01-06 10:20:00,Mobile_App_Database
+57,57,C-ROM-CUST-07,Aurora Colombo,a.colombo@example.it,Viale di Trastevere 50,41.8850,12.4730,New,2026-01-06 10:20:00,Mobile_App_Database
+58,58,C-ROM-CUST-08,Lorenzo Ricci,l.ricci@example.it,Via Marmorata 12,41.8790,12.4785,Regular,2026-01-06 10:20:00,Mobile_App_Database
+59,59,C-ROM-CUST-09,Alice Marino,a.marino@example.it,Via Galvani 25,41.8770,12.4770,VIP,2026-01-06 10:20:00,Mobile_App_Database
+60,60,C-ROM-CUST-10,Leonardo Greco,l.greco@example.it,Via Nicola Zabaglia 5,41.8755,12.4755,New,2026-01-06 10:20:00,Mobile_App_Database
+61,61,C-ROM-CUST-11,Emma Bruno,e.bruno@example.it,Via Giovanni Branca 40,41.8785,12.4740,Regular,2026-01-06 10:20:00,Mobile_App_Database
+62,62,C-ROM-CUST-12,Mattia Gallo,m.gallo@example.it,Largo di Torre Argentina,41.8955,12.4765,VIP,2026-01-06 10:20:00,Mobile_App_Database
+63,63,C-ROM-CUST-13,Giorgia Conti,g.conti@example.it,Via dei Giubbonari 15,41.8940,12.4738,Regular,2026-01-06 10:20:00,Mobile_App_Database
+64,64,C-ROM-CUST-14,Gabriele De Luca,g.deluca@example.it,Via del Pellegrino 80,41.8970,12.4700,New,2026-01-06 10:20:00,Mobile_App_Database
+65,65,C-ROM-CUST-15,Beatrice Mancini,b.mancini@example.it,Via Giulia 100,41.8960,12.4655,Regular,2026-01-06 10:20:00,Mobile_App_Database
+66,66,C-ROM-CUST-16,Riccardo Costa,r.costa@example.it,Corso Vittorio Emanuele II,41.8980,12.4680,New,2026-01-06 10:20:00,Mobile_App_Database
+67,67,C-ROM-CUST-17,Ludovica Giordano,l.giordano@example.it,Via Cola di Rienzo 150,41.9085,12.4650,VIP,2026-01-06 10:20:00,Mobile_App_Database
+68,68,C-ROM-CUST-18,Tommaso Rizzo,t.rizzo@example.it,Piazza del Popolo,41.9105,12.4763,Regular,2026-01-06 10:20:00,Mobile_App_Database
+69,69,C-ROM-CUST-19,Sara Lombardi,s.lombardi@example.it,Via del Corso 300,41.9000,12.4800,Regular,2026-01-06 10:20:00,Mobile_App_Database
+70,70,C-ROM-CUST-20,Edoardo Moretti,e.moretti@example.it,Via del Tritone 10,41.9025,12.4840,New,2026-01-06 10:20:00,Mobile_App_Database
+71,71,C-ROM-CUST-21,Chiara Barbieri,c.barbieri@example.it,Via Nazionale 200,41.9005,12.4895,VIP,2026-01-06 10:20:00,Mobile_App_Database
+72,72,C-ROM-CUST-22,Filippo Fontana,f.fontana@example.it,Via Panisperna 50,41.8965,12.4910,Regular,2026-01-06 10:20:00,Mobile_App_Database
+73,73,C-ROM-CUST-23,Anna Santoro,a.santoro@example.it,Via dei Fori Imperiali,41.8925,12.4880,New,2026-01-06 10:20:00,Mobile_App_Database
+74,74,C-ROM-CUST-24,Pietro Mariani,p.mariani@example.it,Via Labicana 10,41.8895,12.4975,Regular,2026-01-06 10:20:00,Mobile_App_Database
+75,75,C-ROM-CUST-25,Elena Rinaldi,e.rinaldi@example.it,Via Merulana 20,41.8880,12.5020,VIP,2026-01-06 10:20:00,Mobile_App_Database
+76,76,C-ROM-CUST-26,Marco Caruso,m.caruso@example.it,Via Ostiense 100,41.8720,12.4830,Regular,2026-01-06 10:20:00,Mobile_App_Database
+77,77,C-ROM-CUST-27,Serena Ferrara,s.ferrara@example.it,Via Porto di Ripa Grande,41.8845,12.4775,New,2026-01-06 10:20:00,Mobile_App_Database
+78,78,C-ROM-CUST-28,Davide Galli,d.galli@example.it,Via di Porta Portese,41.8820,12.4745,Regular,2026-01-06 10:20:00,Mobile_App_Database
+79,79,C-ROM-CUST-29,Valentina Martini,v.martini@example.it,Via degli Orti di Trastevere,41.8810,12.4710,VIP,2026-01-06 10:20:00,Mobile_App_Database
+80,80,C-ROM-CUST-30,Simone Leone,s.leone@example.it,Circonvallazione Gianicolense,41.8750,12.4630,New,2026-01-06 10:20:00,Mobile_App_Database
+81,81,C-ROM-CUST-31,Francesca Longo,f.longo@example.it,Via Alberto Mario 12,41.8825,12.4590,Regular,2026-01-06 10:20:00,Mobile_App_Database
+82,82,C-ROM-CUST-32,Antonio Gatti,a.gatti@example.it,Viale delle Mura Gianicolensi,41.8865,12.4615,Regular,2026-01-06 10:20:00,Mobile_App_Database
+83,83,C-ROM-CUST-33,Sonia Gentile,s.gentile@example.it,Via Aurelia Antica 10,41.8888,12.4500,New,2026-01-06 10:20:00,Mobile_App_Database
+84,84,C-ROM-CUST-34,Roberto Villa,r.villa@example.it,Via Crescenzio 20,41.9045,12.4635,Regular,2026-01-06 10:20:00,Mobile_App_Database
+85,85,C-ROM-CUST-35,Paola Pellegrini,p.pellegrini@example.it,Piazza del Risorgimento,41.9060,12.4585,VIP,2026-01-06 10:20:00,Mobile_App_Database
+86,86,C-ROM-CUST-36,Fabio Palumbo,f.palumbo@example.it,Via Leone IV,41.9080,12.4550,Regular,2026-01-06 10:20:00,Mobile_App_Database
+87,87,C-ROM-CUST-37,Silvia Sanna,s.sanna@example.it,Via Ottaviano 40,41.9095,12.4570,New,2026-01-06 10:20:00,Mobile_App_Database
+88,88,C-ROM-CUST-38,Daniele Farina,d.farina@example.it,Viale Angelico 15,41.9150,12.4580,Regular,2026-01-06 10:20:00,Mobile_App_Database
+89,89,C-ROM-CUST-39,Laura Rizzi,l.rizzi@example.it,Piazza Mazzini,41.9165,12.4645,VIP,2026-01-06 10:20:00,Mobile_App_Database
+90,90,C-ROM-CUST-40,Enrico Monti,e.monti@example.it,Viale Giuseppe Mazzini,41.9145,12.4685,Regular,2026-01-06 10:20:00,Mobile_App_Database
+91,91,C-ROM-CUST-41,Ilaria Basile,i.basile@example.it,Lungotevere della Vittoria,41.9210,12.4630,New,2026-01-06 10:20:00,Mobile_App_Database
+92,92,C-ROM-CUST-42,Claudio Basso,c.basso@example.it,Via Flaminia 50,41.9120,12.4750,Regular,2026-01-06 10:20:00,Mobile_App_Database
+93,93,C-ROM-CUST-43,Vanessa Pellegrino,v.pellegrino@example.it,Via di Ripetta 10,41.9080,12.4770,VIP,2026-01-06 10:20:00,Mobile_App_Database
+94,94,C-ROM-CUST-44,Manuel Moretti,m.moretti@example.it,Via della Scrofa 25,41.9020,12.4755,Regular,2026-01-06 10:20:00,Mobile_App_Database
+95,95,C-ROM-CUST-45,Rachele Silvestri,r.silvestri@example.it,Piazza Navona 1,41.8990,12.4730,New,2026-01-06 10:20:00,Mobile_App_Database
+96,96,C-ROM-CUST-46,Federico Serra,f.serra@example.it,Via de' Baullari 5,41.8968,12.4725,Regular,2026-01-06 10:20:00,Mobile_App_Database
+97,97,C-ROM-CUST-47,Marta Marchetti,m.marchetti@example.it,Largo Argentina,41.8950,12.4772,VIP,2026-01-06 10:20:00,Mobile_App_Database
+98,98,C-ROM-CUST-48,Jacopo Testa,j.testa@example.it,Via Arenula 12,41.8930,12.4760,Regular,2026-01-06 10:20:00,Mobile_App_Database
+99,99,C-ROM-CUST-49,Noemi Palmieri,n.palmieri@example.it,Piazza Mattei,41.8938,12.4782,New,2026-01-06 10:20:00,Mobile_App_Database
+100,100,C-ROM-CUST-50,Elias Gallo,e.gallo@example.it,Via del Portico d'Ottavia,41.8925,12.4785,Regular,2026-01-06 10:20:00,Mobile_App_Database

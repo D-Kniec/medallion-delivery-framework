@@ -24,6 +24,33 @@ PATHS = {
     "pizzerias": BASE_BRONZE_PATH / 'pizzerias' / 'pizzerias.csv'
 }
 
+telemetry_buffer = []
+orders_buffer = []
+last_flush_time = time.time()
+
+def flush_buffers():
+    global last_flush_time
+    now = datetime.now(timezone.utc)
+    dt_str = now.strftime("%Y-%m-%d")
+    timestamp_suffix = int(now.timestamp())
+
+    for data_type, buffer in [("telemetry", telemetry_buffer), ("orders", orders_buffer)]:
+        if not buffer:
+            continue
+        
+        partition_path = BASE_BRONZE_PATH / data_type / f"dt={dt_str}"
+        partition_path.mkdir(parents=True, exist_ok=True)
+        
+        file_path = partition_path / f"{data_type}_batch_{timestamp_suffix}.json"
+        
+        with open(file_path, 'a', encoding='utf-8') as f:
+            for record in buffer:
+                f.write(json.dumps(record) + '\n')
+        
+        buffer.clear()
+    
+    last_flush_time = time.time()
+
 def calculate_dist_km(lat1, lon1, lat2, lon2):
     return math.sqrt((lat2 - lat1)**2 + (lon2 - lon1)**2) * 111.1
 
@@ -95,7 +122,8 @@ try:
                     "delivery_charge": float(round(random.uniform(5, 15), 2)),
                     "prep_ticks_left": random.randint(15, 40)
                 }
-                print(json.dumps({
+                
+                order_event = {
                     "event_type": "order_created",
                     "order_id": selected_courier["current_order"]["order_id"],
                     "customer_id": selected_courier["current_order"]["customer_id"],
@@ -104,7 +132,10 @@ try:
                     "delivery_charge": selected_courier["current_order"]["delivery_charge"],
                     "pizzeria_lat": selected_courier["base_lat"],
                     "pizzeria_lon": selected_courier["base_lon"]
-                }))
+                }
+                print(json.dumps(order_event))
+                orders_buffer.append(order_event)
+                
                 selected_courier["trip_total_dist"] = calculate_dist_km(selected_courier["base_lat"], selected_courier["base_lon"], customer["lat"], customer["lon"])
                 selected_courier["status"] = "PREPARING"
                 selected_courier["force_initial_prep_log"] = True
@@ -162,7 +193,8 @@ try:
                     order_time_dt = datetime.strptime(ord_ref["order_timestamp"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
                     dist_from_base = calculate_dist_km(c["current_lat"], c["current_lon"], c["base_lat"], c["base_lon"])
                     zone_key, _ = get_zone_data(c["current_lat"], c["current_lon"], c["base_lat"], c["base_lon"])
-                    print(json.dumps({
+                    
+                    telemetry_event = {
                         "event_type": "telemetry",
                         "event_id": str(uuid.uuid4()),
                         "status_key": c["status"],
@@ -181,12 +213,20 @@ try:
                         "is_outside_geofence": dist_from_base > GEOFENCE_RADIUS_KM,
                         "zone_key": zone_key,
                         "is_delayed_delivery": (now_dt - order_time_dt) > timedelta(minutes=DELAY_THRESHOLD_MIN)
-                    }))
+                    }
+                    print(json.dumps(telemetry_event))
+                    telemetry_buffer.append(telemetry_event)
+                    
                     c["log_counter"] = 0
             if c["status"] == "DELIVERED":
                 c["trip_total_dist"] = calculate_dist_km(c["current_lat"], c["current_lon"], c["base_lat"], c["base_lon"])
                 c["status"] = "RETURNING"
                 c["log_counter"] = 0
+
+        if (time.time() - last_flush_time > 60) or (len(telemetry_buffer) > 100) or (len(orders_buffer) > 100):
+            flush_buffers()
+
         time.sleep(STEP_DURATION)
 except KeyboardInterrupt:
+    flush_buffers()
     pass

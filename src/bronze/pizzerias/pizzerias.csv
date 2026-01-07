@@ -1,0 +1,3 @@
+raw_id,pizzeria_id,pizzeria_name,city,address_raw,lat,lon,manager_info,ingested_at
+1,PIZ-WAW-001,Warsaw Central Pizza,Warsaw,ul. Marszalkowska 100,52.2297,21.0122,Robert Lewandowski,2026-01-06 10:00:00
+2,PIZ-ROM-001,Roma Trastevere Delizia,Rome,Via della Scala 28,41.8892,12.4691,Francesco Totti,2026-01-06 10:00:00

@@ -64,6 +64,7 @@ processed_stream = raw_telemetry \
         F.col("lon"),
         F.col("status_key").alias("status"),
         F.col("speed"),
+        F.col("realization_percent"),
         F.col("order_id"),
         F.col("customer_id"),
         

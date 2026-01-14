@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
@@ -10,25 +8,44 @@ services:
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: metabase_db
     ports:
-      - "5432:5432"  
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data 
+      - postgres_data:/var/lib/postgresql/data
 
   metabase:
     image: metabase/metabase:latest
     container_name: pizza_metabase
     restart: always
     ports:
-      - "3000:3000"  
+      - "3000:3000"
     environment:
       MB_DB_TYPE: postgres
       MB_DB_DBNAME: metabase_db
       MB_DB_PORT: 5432
       MB_DB_USER: user
       MB_DB_PASS: pass
-      MB_DB_HOST: postgres 
+      MB_DB_HOST: postgres
     depends_on:
       - postgres
+
+  airflow:
+      build: .
+      container_name: pizza_airflow
+      environment:
+        - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+        - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://user:pass@postgres/metabase_db
+        - AIRFLOW__CORE__LOAD_EXAMPLES=False
+        - _AIRFLOW_WWW_USER_USERNAME=admin
+        - _AIRFLOW_WWW_USER_PASSWORD=admin_password
+      volumes:
+        - ./orchestration/dags:/opt/airflow/dags
+        - ./src:/opt/airflow/src
+        - ./jars:/opt/airflow/jars
+      ports:
+        - "8080:8080"
+      command: airflow standalone
+      depends_on:
+        - postgres
 
 volumes:
   postgres_data:

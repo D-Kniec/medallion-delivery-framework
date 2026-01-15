@@ -8,38 +8,62 @@ The platform leverages DuckDB as a high-performance OLAP engine, with Apache Air
 
 
 ```mermaid
-graph TD
-    subgraph Infrastructure [Environment: Docker]
-        subgraph Orchestration [Orchestration]
-            A[Apache Airflow]
-        end
+flowchart LR
+    subgraph Infrastructure["Infrastructure: Docker Compose"]
+        Orchestration
+        Sources
+        DataPipeline
+        Analytics
+    end
 
-        subgraph Sources [Data Sources]
-            S1[Pizza Orders API]
-            S2[Courier GPS Stream/JSON]
-        end
+    %% Orchestration & Monitoring
+    subgraph Orchestration["Orchestration & Monitoring"]
+        A["Apache Airflow"]
+    end
 
-        subgraph Storage [Storage & Processing: DuckDB]
-            direction TB
-            B1[(Bronze: Raw Landing)]
-            B2[(Silver: Refined Data)]
-            B3[(Gold: Star Schema)]
-            
-            B1 -->|Python + SQL| B2
-            B2 -->|Python + SQL| B3
-        end
+    %% Data Source
+    subgraph Sources["Data Generation"]
+        S1["Python Generator<br>telemetry_generator.py"]
+    end
 
-        subgraph Analytics [Consumption]
-            B3 --> BI[DuckDB / Metabase]
-            B3 --> ML[Delivery Analytics]
+    %% Data Pipeline Grouping
+    subgraph DataPipeline["Processing: Spark & Storage: Postgres"]
+        B1[("Bronze: JSONL Raw")]
+        subgraph Lambda_Arch["Lambda Architecture Processing"]
+            subgraph Speed_Layer["Speed Layer: Streaming"]
+                SL_Proc["Spark Streaming Job<br>orders_gold_speed_layer..."]
+            end
+            subgraph Batch_Layer["Batch Layer: Archiving & Batch"]
+                BL_Arch["Spark Archiver<br>bronze_to_silver..."]
+                B2[("Silver: Parquet Clean")]
+                BL_Agg["Spark Batch Job<br>calc_daily_kpi.py"]
+            end
+        end
+        subgraph Gold_Storage["Gold: PostgreSQL DB"]
+            B3_Live["Table: live_orders_log"]
+            B3_Agg["Table: daily_sales_fact"]
         end
     end
 
-    %% Airflow Workflow
-    A -.->|1. Trigger Ingestion| S1
-    A -.->|1. Trigger Ingestion| S2
-    A -.->|2. Run Silver Transformation| B2
-    A -.->|3. Run Gold Modeling| B3
+    %% Analytics/Consumption
+    subgraph Analytics["Consumption"]
+        BI_Realtime["Metabase: Live Map"]
+        BI_Reports["Metabase: Daily Reports"]
+    end
+
+    %% Connections
+    S1 -- "JSONL Logs" --> B1
+    B1 -- "Read Stream" --> SL_Proc
+    B1 -- "Read Batch" --> BL_Arch
+    SL_Proc -- "Write JDBC" --> B3_Live
+    BL_Arch -- "Write Parquet" --> B2
+    B2 -- "Read Parquet" --> BL_Agg
+    BL_Agg -- "Write JDBC" --> B3_Agg
+    B3_Live --> BI_Realtime
+    B3_Agg --> BI_Reports
+    A -. "1. Monitor SQL Sensor" .-> B3_Live
+    A -. "2. Trigger Daily Batch" .-> BL_Agg
+    A -. "3. Trigger Maintenance" .-> B2
 ```
 
 

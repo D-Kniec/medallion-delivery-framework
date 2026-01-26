@@ -1,16 +1,104 @@
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  airflow_db_password:
+    file: ./secrets/airflow_db_password.txt
+
+x-airflow-common: &airflow-common
+  build: .
+  secrets:
+    - airflow_db_password
+    - postgres_password
+  environment:
+    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN_CMD=bash -c "echo -n postgresql+psycopg2://airflow_user:$(cat /run/secrets/airflow_db_password)@postgres/airflow_metadata"
+    - AIRFLOW_CONN_POSTGRES_DEFAULT=postgresql://admin_user:SuperSecretAdminPass@postgres:5432/warehouse_db
+    - AIRFLOW_CONN_SPARK_DEFAULT=spark://local
+    - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
+    - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+  volumes:
+    - ./orchestration/dags:/opt/airflow/dags
+    - ./src:/opt/airflow/src
+    - ./jars:/opt/airflow/jars
+    - ./chk:/opt/airflow/chk
+    - ./logs:/opt/airflow/logs
+  depends_on:
+    postgres:
+      condition: service_healthy
+  networks:
+    - data-pipeline-net
+  deploy:
+    resources:
+      limits:
+        cpus: '2.0'
+        memory: 4G
+      reservations:
+        memory: 1G
+
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15
     container_name: pizza_postgres
     restart: always
+    secrets:
+      - postgres_password
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: metabase_db
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: root_admin
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./create_databases.sql:/docker-entrypoint-initdb.d/create_databases.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "root_admin"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    networks:
+      - data-pipeline-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: pizza_airflow_init
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN_CMD=bash -c "echo -n postgresql+psycopg2://airflow_user:$(cat /run/secrets/airflow_db_password)@postgres/airflow_metadata"
+      - _AIRFLOW_DB_UPGRADE=true
+      - _AIRFLOW_WWW_USER_CREATE=true
+      - _AIRFLOW_WWW_USER_USERNAME=admin
+      - _AIRFLOW_WWW_USER_PASSWORD_CMD=bash -c "cat /run/secrets/postgres_password"
+      - _AIRFLOW_WWW_USER_ROLE=Admin
+    command: bash -c "airflow db migrate && airflow users create --username admin --password $(cat /run/secrets/postgres_password) --firstname Pizza --lastname Admin --role Admin --email admin@pizza.com"
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: pizza_airflow_webserver
+    command: airflow webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: pizza_airflow_scheduler
+    command: airflow scheduler
+    restart: always
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
 
   metabase:
     image: metabase/metabase:latest
@@ -18,34 +106,28 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    secrets:
+      - postgres_password
     environment:
       MB_DB_TYPE: postgres
-      MB_DB_DBNAME: metabase_db
+      MB_DB_DBNAME: warehouse_db
       MB_DB_PORT: 5432
-      MB_DB_USER: user
-      MB_DB_PASS: pass
+      MB_DB_USER: admin_user
+      MB_DB_PASS_FILE: /run/secrets/postgres_password
       MB_DB_HOST: postgres
+    networks:
+      - data-pipeline-net
     depends_on:
-      - postgres
-
-  airflow:
-      build: .
-      container_name: pizza_airflow
-      environment:
-        - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-        - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://user:pass@postgres/metabase_db
-        - AIRFLOW__CORE__LOAD_EXAMPLES=False
-        - _AIRFLOW_WWW_USER_USERNAME=admin
-        - _AIRFLOW_WWW_USER_PASSWORD=admin_password
-      volumes:
-        - ./orchestration/dags:/opt/airflow/dags
-        - ./src:/opt/airflow/src
-        - ./jars:/opt/airflow/jars
-      ports:
-        - "8080:8080"
-      command: airflow standalone
-      depends_on:
-        - postgres
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 2G
 
 volumes:
   postgres_data:
+
+networks:
+  data-pipeline-net:
+    driver: bridge

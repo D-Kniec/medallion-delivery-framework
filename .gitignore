@@ -1,35 +1,51 @@
+# --- BEZPIECZEŃSTWO (Najważniejsze!) ---
+# Ignoruj foldery z hasłami i kluczami
+secrets/
+*.env
+.env.*
 
+# --- DANE I STATUSY (Medallion Architecture) ---
+# Ignorujemy wygenerowane dane w warstwach, ale zostawiamy strukturę folderów
+# Spark Checkpoints (stan streamingu)
+chk/
+checkpoint/
+
+# Warstwa Bronze (surowe dane JSON z generatora)
+src/bronze/*
+!src/bronze/.gitkeep
+
+# Warstwa Silver (przetworzone pliki Parquet i metadane Sparka)
+src/silver/*
+!src/silver/.gitkeep
+
+# Metadane Sparka (często pojawiają się w folderach z danymi)
+_spark_metadata/
+
+# --- LOGI I PLIKI TYMCZASOWE ---
+logs/
+*.log
+tmp/
+
+# --- ZALEŻNOŚCI I BINARIA ---
+# Pliki JAR (chyba że chcesz trzymać sterownik Postgresa w repo - wtedy usuń linię poniżej)
+jars/
+*.jar
+
+# --- PYTHON ---
 __pycache__/
 *.py[cod]
 *$py.class
 .venv/
 venv/
 env/
-.env
 
-chk/
-
-
-jars/
-*.jar
-
-
-
-
-
-src/bronze/telemetry/
-src/bronze/orders/
-
-_spark_metadata/
-.part*
-*.crc
-*.parquet
-*.json.crc
-
-.vscode/
+# --- IDE i OS ---
 .idea/
+.vscode/
 .DS_Store
 Thumbs.db
 
-*.log
-logs/
+# --- DOCKER ---
+# Jeśli montujesz wolumeny lokalnie w folderze projektu (np. dane Postgresa)
+postgres_data/
+metabase_data/

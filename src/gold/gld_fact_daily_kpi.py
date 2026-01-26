@@ -1,23 +1,32 @@
 import os
 import sys
-import socket
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import sum, avg, count, current_timestamp
 
-def get_env_config():
+def get_secret(secret_name, default=None):
     try:
-        socket.gethostbyname('postgres')
-        return 'postgres', '/opt/airflow'
-    except socket.gaierror:
-        local_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        return 'localhost', local_root
+        with open(f"/run/secrets/{secret_name}", "r") as file:
+            return file.read().strip()
+    except IOError:
+        return os.getenv(secret_name.upper(), default)
 
-db_host, root_path = get_env_config()
-jar_path = os.path.join(root_path, "jars", "postgresql-42.7.2.jar")
-input_path = os.path.join(root_path, "src", "silver", "orders")
+current_script_path = os.path.abspath(__file__)
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_script_path)))
+jar_path = os.path.join(project_root, "jars", "postgresql-42.7.2.jar")
+input_path = os.path.join(project_root, "src", "silver", "orders")
 
-DB_URL = f"jdbc:postgresql://{db_host}:5432/metabase_db?stringtype=unspecified"
-DB_PROPS = {"user": "user", "password": "pass", "driver": "org.postgresql.Driver", "truncate": "true"}
+db_host = os.getenv("DB_HOST", "postgres")
+db_name = os.getenv("DB_NAME", "warehouse_db")
+db_user = os.getenv("DB_USER", "admin_user")
+db_pass = get_secret("postgres_password", "admin_password")
+
+DB_URL = f"jdbc:postgresql://{db_host}:5432/{db_name}?stringtype=unspecified"
+DB_PROPS = {
+    "user": db_user,
+    "password": db_pass,
+    "driver": "org.postgresql.Driver",
+    "truncate": "true"
+}
 
 spark = SparkSession.builder \
     .appName("Batch-Daily-KPI") \
@@ -29,14 +38,11 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 try:
-    print(f"Reading from path: {input_path}")
-    
     df = spark.read \
         .option("basePath", input_path) \
         .parquet(input_path)
 
     if df.isEmpty():
-        print("Dataset is empty. Skipping calculation.")
         sys.exit(0)
 
     daily_kpi = df.groupBy("order_date").agg(
@@ -46,12 +52,14 @@ try:
         avg("gross_revenue").alias("avg_order_value")
     ).withColumn("calculated_at", current_timestamp())
 
-    print(f"Writing results to: {DB_URL}")
-    daily_kpi.write.jdbc(url=DB_URL, table="gold.daily_sales_fact", mode="overwrite", properties=DB_PROPS)
-    print("Success: Fact table updated.")
+    daily_kpi.write.jdbc(
+        url=DB_URL, 
+        table="gold.daily_sales_fact", 
+        mode="overwrite", 
+        properties=DB_PROPS
+    )
 
 except Exception as e:
-    print(f"FAILED: {str(e)}")
     raise e
 finally:
     spark.stop()

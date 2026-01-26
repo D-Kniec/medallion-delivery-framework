@@ -3,6 +3,13 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import *
 
+def get_secret(secret_name, default=None):
+    try:
+        with open(f"/run/secrets/{secret_name}", "r") as file:
+            return file.read().strip()
+    except IOError:
+        return os.getenv(secret_name.upper(), default)
+
 current_script_path = os.path.abspath(__file__)
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_script_path)))
 
@@ -10,10 +17,13 @@ input_path = os.path.join(project_root, "src", "bronze", "telemetry")
 checkpoint_path = os.path.join(project_root, "chk", "gold_speed_layer")
 jar_path = os.path.join(project_root, "jars", "postgresql-42.7.2.jar")
 
-DB_URL = "jdbc:postgresql://localhost:5432/metabase_db"
-DB_USER = "user"
-DB_PASS = "pass"
-DB_TABLE = "gold.live_courier_locations_log"
+db_host = os.getenv("DB_HOST", "postgres")
+db_name = os.getenv("DB_NAME", "warehouse_db")
+db_user = os.getenv("DB_USER", "admin_user")
+db_pass = get_secret("postgres_password", "admin_password")
+db_table = "gold.live_courier_locations_log"
+
+db_url = f"jdbc:postgresql://{db_host}:5432/{db_name}"
 
 spark = SparkSession.builder \
     .appName("Gold-SpeedLayer-telemetry") \
@@ -36,13 +46,10 @@ telemetry_schema = StructType([
     StructField("lon", DoubleType(), True),
     StructField("speed", DoubleType(), True),
     StructField("realization_percent", DoubleType(), True),
-    
     StructField("zone_key", IntegerType(), True),
-    
     StructField("is_delayed_delivery", BooleanType(), True),
     StructField("is_outside_geofence", BooleanType(), True),
     StructField("customer_id", StringType(), True),
-    
     StructField("order_timestamp", StringType(), True),
     StructField("kitchen_acceptance_timestamp", StringType(), True),
     StructField("ready_for_pickup_timestamp", StringType(), True),
@@ -67,18 +74,14 @@ processed_stream = raw_telemetry \
         F.col("realization_percent"),
         F.col("order_id"),
         F.col("customer_id"),
-        
         F.col("zone_key"),
-        
         F.col("is_outside_geofence"),
         F.col("is_delayed_delivery"),
-        
         F.to_timestamp("order_timestamp", "yyyy-MM-dd'T'HH:mm:ss'Z'").alias("order_timestamp"),
         F.to_timestamp("ready_for_pickup_timestamp", "yyyy-MM-dd'T'HH:mm:ss'Z'").alias("ready_for_pickup_timestamp"),
         F.to_timestamp("pickup_timestamp", "yyyy-MM-dd'T'HH:mm:ss'Z'").alias("pickup_timestamp"),
         F.to_timestamp("delivery_timestamp", "yyyy-MM-dd'T'HH:mm:ss'Z'").alias("delivery_timestamp"),
         F.to_timestamp("kitchen_acceptance_timestamp", "yyyy-MM-dd'T'HH:mm:ss'Z'").alias("kitchen_acceptance_timestamp"),
-        
         F.current_timestamp().alias("ingestion_timestamp")
     )
 
@@ -88,15 +91,13 @@ def write_to_postgres(df_batch, batch_id):
     
     df_batch.write \
         .format("jdbc") \
-        .option("url", DB_URL) \
-        .option("dbtable", DB_TABLE) \
-        .option("user", DB_USER) \
-        .option("password", DB_PASS) \
+        .option("url", db_url) \
+        .option("dbtable", db_table) \
+        .option("user", db_user) \
+        .option("password", db_pass) \
         .option("driver", "org.postgresql.Driver") \
         .mode("append") \
         .save()
-
-print(">>> STARTING GOLD SPEED LAYER (WITH ZONE_KEY)")
 
 query = processed_stream.writeStream \
     .foreachBatch(write_to_postgres) \

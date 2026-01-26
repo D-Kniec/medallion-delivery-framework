@@ -3,15 +3,27 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 from pyspark.sql.types import NullType, TimestampType, DateType, IntegerType, BooleanType
 
+def get_secret(secret_name, default=None):
+    try:
+        with open(f"/run/secrets/{secret_name}", "r") as file:
+            return file.read().strip()
+    except IOError:
+        return os.getenv(secret_name.upper(), default)
+
 current_script_path = os.path.abspath(__file__)
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_script_path)))
 jar_path = os.path.join(project_root, "jars", "postgresql-42.7.2.jar")
 INPUT_DIR = os.path.join(project_root, "src", "silver", "dimension")
 
-DB_URL = "jdbc:postgresql://localhost:5432/metabase_db?stringtype=unspecified"
+db_host = os.getenv("DB_HOST", "postgres")
+db_name = os.getenv("DB_NAME", "warehouse_db")
+db_user = os.getenv("DB_USER", "admin_user")
+db_pass = get_secret("postgres_password", "admin_password")
+
+DB_URL = f"jdbc:postgresql://{db_host}:5432/{db_name}?stringtype=unspecified"
 DB_PROPS = {
-    "user": "user",
-    "password": "pass",
+    "user": db_user,
+    "password": db_pass,
     "driver": "org.postgresql.Driver",
     "truncate": "true"
 }
@@ -32,7 +44,6 @@ def enforce_schema_types(df, table_name):
         df = df.withColumn("birth_year", col("birth_year").cast(IntegerType()))
     
     if "dim_date" in table_name:
-        # Convert BIGINT nanoseconds to seconds, then Timestamp, then Date
         df = df.withColumn("full_date", (col("full_date") / 1000000000).cast(TimestampType()).cast(DateType()))
     
     if "dim_courier" in table_name:

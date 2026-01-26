@@ -1,9 +1,7 @@
 import os
-import time
-from tqdm import tqdm
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
-from pyspark.sql.types import *
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType
 
 current_script_path = os.path.abspath(__file__)
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_script_path)))
@@ -30,10 +28,9 @@ orders_schema = StructType([
     StructField("pizzeria_lon", DoubleType(), True)
 ])
 
-
 raw_orders = spark.readStream \
     .schema(orders_schema) \
-    .option("maxFilesPerTrigger", 100) \
+    .option("maxFilesPerTrigger", 1000) \
     .json(input_path)
 
 silver_orders = raw_orders \
@@ -50,29 +47,7 @@ query = silver_orders \
     .option("path", output_path) \
     .option("checkpointLocation", checkpoint_path) \
     .partitionBy("order_date") \
+    .trigger(availableNow=True) \
     .start()
 
-print("Starting processing... (Press Ctrl+C to stop)")
-
-pbar = tqdm(desc="Processing Batches (Chunks of files)", unit="batch")
-last_batch_id = -1
-
-try:
-    while query.isActive:
-        progress = query.lastProgress
-        
-        if progress:
-            current_batch_id = progress['batchId']
-            num_input_rows = progress['numInputRows']
-            
-            if current_batch_id > last_batch_id:
-                pbar.update(1)
-                pbar.set_postfix({"rows": num_input_rows, "latest_batch": current_batch_id})
-                last_batch_id = current_batch_id
-        
-     
-except KeyboardInterrupt:
-    print("\nStopping stream...")
-    query.stop()
-    pbar.close()
-    print("Stopped.")
+query.awaitTermination()

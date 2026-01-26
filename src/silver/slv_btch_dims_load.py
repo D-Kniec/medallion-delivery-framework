@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 
 current_script_path = os.path.abspath(__file__)
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_script_path)))
@@ -150,4 +150,3 @@ if __name__ == "__main__":
     save_to_parquet(df_pizzeria, "dim_pizzeria.parquet")
     save_to_parquet(df_courier, "dim_courier.parquet")
     save_to_parquet(df_customer, "dim_customer.parquet")
-    

@@ -1,9 +1,7 @@
 import os
-import time
-from tqdm import tqdm
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
-from pyspark.sql.types import *
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType, BooleanType
 
 current_script_path = os.path.abspath(__file__)
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_script_path)))
@@ -36,9 +34,8 @@ telemetry_schema = StructType([
 
 raw_telemetry = spark.readStream \
     .schema(telemetry_schema) \
-    .option("maxFilesPerTrigger", 200) \
+    .option("maxFilesPerTrigger", 1000) \
     .json(input_path)
-
 
 silver_telemetry = raw_telemetry \
     .withColumn("timestamp", F.to_timestamp("timestamp")) \
@@ -54,28 +51,7 @@ query = silver_telemetry \
     .option("path", output_path) \
     .option("checkpointLocation", checkpoint_path) \
     .partitionBy("event_date") \
+    .trigger(availableNow=True) \
     .start()
 
-print("Starting Telemetry processing... (Press Ctrl+C to stop)")
-
-pbar = tqdm(desc="Processing Telemetry Batches", unit="batch")
-last_batch_id = -1
-
-try:
-    while query.isActive:
-        progress = query.lastProgress
-        if progress:
-            current_batch_id = progress['batchId']
-            num_input_rows = progress['numInputRows']
-            
-            if current_batch_id > last_batch_id:
-                pbar.update(1)
-                pbar.set_postfix({"rows": num_input_rows, "latest_batch": current_batch_id})
-                last_batch_id = current_batch_id
-        time.sleep(0.5) 
-
-except KeyboardInterrupt:
-    print("\nStopping telemetry stream...")
-    query.stop()
-    pbar.close()
-    print("Stopped.")
+query.awaitTermination()

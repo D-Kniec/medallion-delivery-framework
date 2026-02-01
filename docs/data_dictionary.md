@@ -1,171 +1,162 @@
-Data Dictionary: Gold Layer (Star Schema)
-1. Introduction
-
-This data dictionary describes the structure and business meaning of the tables within the Gold Layer (Star Schema). The model is designed to analyze pizza delivery performance and monitor courier telemetry data.
-2. Fact Table: fact_order_performance
-
-The fact table stores data regarding individual orders and their associated time and distance metrics. Grain: One row per unique order.
-
-    order_id: Unique business identifier for the order.
-
-    courier_key: Foreign key to the courier dimension (dim_courier).
-
-    pizzeria_key: Foreign key to the pizzeria dimension (dim_pizzeria).
-
-    customer_key: Foreign key to the customer dimension (dim_customer).
-
-    date_key: Foreign key to the date dimension (dim_date).
-
-    status_key: Foreign key to the order status dimension (dim_order_status).
-
-    zone_key: Foreign key to the delivery zone dimension (dim_delivery_zone).
-
-    order_timestamp: The date and time the order was placed.
-
-    kitchen_acceptance_timestamp: The time the kitchen accepted the order for production.
-
-    ready_for_pickup_timestamp: The time production ended and the order was ready for delivery.
-
-    pickup_timestamp: The time the courier physically picked up the order.
-
-    delivery_timestamp: The time the order was delivered to the customer.
-
-    production_duration_seconds: Time taken to prepare the pizza (Ready - Acceptance).
-
-    waiting_for_courier_seconds: Time the order waited for the courier (Pickup - Ready).
-
-    delivery_duration_seconds: The duration of the actual delivery transit (Delivery - Pickup).
-
-    total_lead_time_seconds: The end-to-end fulfillment time (Delivery - Order).
-
-    planned_distance_meters: The optimal distance to the destination calculated at the time of order.
-
-    actual_distance_meters: The real distance traveled by the courier based on GPS telemetry pings.
-
-    distance_variance_pct: Percentage difference between actual and planned distance.
-
-    average_speed_kmh: The courier's average speed during delivery calculated from telemetry data.
-
-    is_outside_geofence: Boolean flag indicating if the courier deviated significantly from the optimal route.
-
-    gross_revenue: Total gross revenue from the order.
-
-    delivery_charge: The delivery fee paid by the customer.
-
-    is_delayed_delivery: Boolean flag indicating if the delivery exceeded the promised SLA time.
-
-3. Dimension: dim_courier
-
-Contains information about couriers. This table uses SCD Type 2 to track changes in equipment, vehicles, and status over time.
-
-    courier_key: Surrogate primary key.
-
-    courier_id: Business identifier for the courier.
-
-    courier_name: Full name of the courier.
-
-    vehicle: Type of vehicle used (e.g., bike, scooter, car).
-
-    vehicle_ownership: Indicates if the vehicle is personal or company-owned.
-
-    equipment_set: Set of equipment assigned (e.g., thermal bag, helmet).
-
-    performance_level: Calculated tier based on historical delivery performance.
-
-    employment_status: Current employment status (e.g., Active, Terminated).
-
-    contract_type: Type of contract (e.g., B2B, Full-time).
-
-    insurance_expiry_date: Expiration date of the courier's insurance.
-
-    valid_from: Start timestamp for the record version validity.
-
-    valid_to: End timestamp for the record version validity.
-
-    is_current: Flag indicating the most recent version of the courier record.
-
-4. Dimension: dim_pizzeria
-
-Describes the pizzerias (dispatch points). Also implements SCD Type 2.
-
-    pizzeria_key: Surrogate primary key.
-
-    pizzeria_id: Business identifier for the store location.
-
-    pizzeria_name: Name of the pizzeria branch.
-
-    store_format: Format of the location (e.g., Express, Dine-in Restaurant).
-
-    operating_hours_type: Type of operating hours (e.g., 24/7, Standard).
-
-    kitchen_capacity_level: Categorization of the kitchen's throughput capacity.
-
-    full_address: Full physical address of the store.
-
-    has_outdoor_seating: Indicates if the location has outdoor seating.
-
-    valid_from: Start timestamp for record validity.
-
-    valid_to: End timestamp for record validity.
-
-    is_current: Flag indicating the current active record.
-
-5. Dimension: dim_customer
-
-Stores demographic and behavioral data about customers.
-
-    customer_key: Surrogate primary key.
-
-    customer_id: Business identifier for the customer.
-
-    customer_name: Full name or alias of the customer.
-
-    customer_segment: Customer segmentation (e.g., VIP, New, Churn-risk).
-
-    loyalty_tier: Tier level in the loyalty program.
-
-    acquisition_channel: Channel through which the customer was acquired (e.g., Web, Mobile App).
-
-    birth_year: Year of birth for demographic analysis.
-
-6. Dimension: dim_date
-
-A standardized date dimension for easy filtering and time-series aggregation.
-
-    date_key: Primary key in YYYYMMDD format.
-
-    full_date: The complete date.
-
-    day_name: Name of the day of the week.
-
-    month_name: Name of the month.
-
-    quarter: Quarter of the year.
-
-    is_weekend: Boolean indicating if the day falls on a weekend.
-
-    is_holiday: Boolean indicating if the day is a public holiday.
-
-7. Dimension: dim_order_status
-
-Describes the possible states of an order.
-
-    status_key: Surrogate primary key.
-
-    status_name: Name of the status (e.g., Delivered, Cancelled, Returned).
-
-    status_category: Higher-level category (e.g., Success, Failure).
-
-    is_final_status: Indicates if this status terminates the order process.
-
-8. Dimension: dim_delivery_zone
-
-Describes the geographic delivery zones.
-
-    zone_key: Surrogate primary key.
-
-    zone_name: Name of the zone (e.g., Downtown, Suburbs).
-
-    zone_type: Type of terrain or area (e.g., Urban, Residential, Industrial).
-
-    average_traffic_density: Average historical traffic density level in the zone.
+# Data Dictionary (Gold Layer)
+
+Technical documentation for the Pizza Delivery OLAP Data Warehouse (PostgreSQL).
+The data model is designed using **Star Schema** principles for high-performance analytics, supplemented by real-time tables for the Speed Layer.
+
+## 1. Dimension Tables (Wymiary)
+
+### `gold.dim_courier` (SCD Type 2)
+Stores historical profiles of couriers. Tracks changes in vehicle, contract, or risk factors over time.
+
+| Column | Type | Key | Description |
+| :--- | :--- | :--- | :--- |
+| `courier_key` | INTEGER | **PK** | Surrogate Key (Unique for every version of a courier). |
+| `courier_id` | VARCHAR | NK | Natural Business Key (Constant for the courier). |
+| `courier_name` | VARCHAR | | Full name of the courier. |
+| `vehicle` | VARCHAR | | Descriptive vehicle info (e.g., "Bike - Trek District"). |
+| `vehicle_ownership` | VARCHAR | | 'Company' vs 'Private'. Affects cost calculations. |
+| `equipment_set` | VARCHAR | | 'Standard', 'Pro', etc. |
+| `performance_level` | VARCHAR | | 'Low', 'Medium', 'High'. |
+| `employment_status` | VARCHAR | | 'Active', 'On Leave', 'Terminated'. |
+| `contract_type` | VARCHAR | | 'B2B', 'Full-time', 'Part-time'. |
+| `insurance_expiry_date` | DATE | | Critical for compliance monitoring. |
+| `accident_risk_factor` | DECIMAL(10,4) | | Risk score (0.0 - 1.0) used for insurance optimization. |
+| `fatigue_resistance` | DECIMAL(10,2) | | Bio-metric score affecting max shift length. |
+| `vehicle_range_km` | DECIMAL(10,2) | | Max distance before refuel/recharge. |
+| `valid_from` | TIMESTAMP | | SCD2: Start validity of this record. |
+| `valid_to` | TIMESTAMP | | SCD2: End validity (NULL if current). |
+| `is_current` | BOOLEAN | | SCD2: Quick filter for current state. |
+
+### `gold.dim_pizzeria` (SCD Type 1)
+Static information about pizza storage locations (nodes).
+
+| Column | Type | Key | Description |
+| :--- | :--- | :--- | :--- |
+| `pizzeria_key` | INTEGER | **PK** | Surrogate Key. |
+| `pizzeria_id` | VARCHAR | NK | Natural Key (e.g., 'PIZ-WAW-01'). |
+| `pizzeria_name` | VARCHAR | | Display name of the restaurant. |
+| `store_format` | VARCHAR | | 'Express', 'Dine-In', 'Dark Kitchen'. |
+| `operating_hours_type`| VARCHAR | | 'Standard', '24h'. |
+| `kitchen_capacity_level`| VARCHAR | | Throughput capacity ('High', 'Low'). |
+| `manager_name` | VARCHAR | | Current responsible manager. |
+| `full_address` | VARCHAR | | Physical address. |
+| `city` | VARCHAR | | City (e.g., 'Warsaw'). |
+| `region` | VARCHAR | | Operational region. |
+| `country` | VARCHAR | | Country code. |
+| `has_outdoor_seating` | BOOLEAN | | Context for summer sales analysis. |
+| `kitchen_performance_factor`| DECIMAL(10,2) | | Efficiency multiplier (0.8 - 1.2). |
+| `lat` / `lon` | DECIMAL(10,4)| | Geographic coordinates. |
+
+### `gold.dim_customer`
+Customer profiles and segmentation.
+
+| Column | Type | Key | Description |
+| :--- | :--- | :--- | :--- |
+| `customer_key` | INTEGER | **PK** | Surrogate Key. |
+| `customer_id` | VARCHAR | NK | Natural Key. |
+| `customer_name` | VARCHAR | | Full Name (GDPR sensitive). |
+| `customer_segment` | VARCHAR | | 'Retail', 'Corporate', 'VIP'. |
+| `loyalty_tier` | VARCHAR | | 'Bronze', 'Silver', 'Gold'. |
+| `acquisition_channel` | VARCHAR | | 'App', 'Web', 'Partner'. |
+| `preferred_payment_method`| VARCHAR | | 'Card', 'Cash', 'ApplePay'. |
+| `birth_year` | INTEGER | | Demographics analysis. |
+| `city` / `postal_code` | VARCHAR | | Location data. |
+| `dropoff_difficulty_score`| DECIMAL(10,2)| | 0.0-1.0 score (e.g. 4th floor without elevator). |
+
+### `gold.dim_order_status`
+Standardized dictionary of possible order states.
+
+| Column | Type | Key | Description |
+| :--- | :--- | :--- | :--- |
+| `status_key` | INTEGER | **PK** | ID (1=IDLE, 5=DELIVERED). |
+| `status_name` | VARCHAR | | 'PREPARING', 'IN_REALIZATION', etc. |
+| `status_category` | VARCHAR | | 'Active', 'Completed', 'Cancelled'. |
+| `is_final_status` | BOOLEAN | | True if the order workflow ends here. |
+
+### `gold.dim_delivery_zone`
+Geographical classification of delivery areas.
+
+| Column | Type | Key | Description |
+| :--- | :--- | :--- | :--- |
+| `zone_key` | INTEGER | **PK** | Zone ID. |
+| `zone_name` | VARCHAR | | e.g., 'Zone 1 (Center)'. |
+| `zone_type` | VARCHAR | | 'Urban', 'Suburban', 'Rural'. |
+| `traffic_drag` | DECIMAL(10,2)| | Coefficient affecting estimated time (higher = slower). |
+
+### `gold.dim_date`
+Standard date dimension for time-series analysis.
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `date_key` | INTEGER | **PK** YYYYMMDD format. |
+| `full_date` | DATE | Standard date format. |
+| `is_weekend` | BOOLEAN | True for Sat/Sun. |
+| `is_holiday` | BOOLEAN | True for national holidays. |
+| `season` | VARCHAR | 'Winter', 'Spring', etc. |
+
+---
+
+## 2. Fact Tables (Fakty)
+
+### `gold.fact_order_performance`
+Central fact table combining timestamps, financial metrics, and references to dimensions.
+
+| Column | Type | Key | Description |
+| :--- | :--- | :--- | :--- |
+| `order_id` | VARCHAR | **PK** | Natural Order ID. |
+| `courier_key` | INTEGER | **FK** | Reference to `dim_courier`. |
+| `pizzeria_key` | INTEGER | **FK** | Reference to `dim_pizzeria`. |
+| `customer_key` | INTEGER | **FK** | Reference to `dim_customer`. |
+| `status_key` | INTEGER | **FK** | Reference to `dim_order_status`. |
+| `zone_key` | INTEGER | **FK** | Reference to `dim_delivery_zone`. |
+| `date_key` | INTEGER | **FK** | Partitioning Key (YYYYMMDD). |
+| `order_timestamp` | TIMESTAMP | | Time order was placed. |
+| `preparation_timestamp`| TIMESTAMP | | Time kitchen started working. |
+| `pickup_timestamp` | TIMESTAMP | | Time courier picked up pizza. |
+| `delivery_timestamp` | TIMESTAMP | | Time customer received pizza. |
+| `return_timestamp` | TIMESTAMP | | Time courier returned to base (if applicable). |
+| `total_distance` | DECIMAL(10,2)| | Distance covered (km). |
+| `total_time` | DECIMAL(10,2)| | Total duration (min). |
+| `outside_geofence` | BOOLEAN | | Flag: Did courier go out of bounds? |
+| `is_completed` | BOOLEAN | | Flag: Was order successful? |
+
+---
+
+## 3. Streaming / Speed Layer Tables
+
+### `gold.live_orders_log`
+Real-time log of incoming orders (Append-Only).
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `order_id` | VARCHAR | Unique Order ID. |
+| `customer_id` | VARCHAR | Reference to customer. |
+| `gross_revenue` | DECIMAL | Value of the order. |
+| `order_timestamp` | TIMESTAMP | Event time. |
+| `ingestion_timestamp`| TIMESTAMP | Processing time (for lag monitoring). |
+
+### `gold.live_fleet_status`
+Real-time snapshot of the fleet (Upsert / Latest State).
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `courier_id` | VARCHAR | Courier ID. |
+| `current_lat/lon` | DECIMAL | Live GPS position. |
+| `order_status` | VARCHAR | What are they doing now? |
+| `speed_kmh` | DECIMAL | Current speed. |
+| `time_left_sec` | DECIMAL | ETA to customer. |
+| `is_outside_geofence`| BOOLEAN | Alert flag. |
+
+---
+
+## 4. Business Views (Widoki)
+
+### `gold.v_order_360`
+Composite view joining Fact, Dims, and Live tables. Used by BI tools (Metabase).
+
+* **Purpose:** Single source of truth for "What happened with Order X?".
+* **Calculated Metrics:**
+    * `preparation_time_sec`: `pickup_timestamp` - `preparation_timestamp`
+    * `pizza_idle_time_sec`: Time pizza waited on the counter.
+    * `realization_percent`: Progress bar (0-100%).
+    * `delayed_delivery`: True if total time > Promised time.

@@ -3,77 +3,84 @@ secrets:
     file: ./secrets/postgres_password.txt
   airflow_db_password:
     file: ./secrets/airflow_db_password.txt
+  warehouse_password:
+    file: ./secrets/warehouse_password.txt
 
 x-airflow-common: &airflow-common
-  build: .
+  build:
+    context: .
+    dockerfile: Dockerfile.airflow
   secrets:
     - airflow_db_password
     - postgres_password
+    - warehouse_password
   environment:
     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN_CMD=bash -c "echo -n postgresql+psycopg2://airflow_user:$(cat /run/secrets/airflow_db_password)@postgres/airflow_metadata"
-    - AIRFLOW_CONN_POSTGRES_DEFAULT=postgresql://admin_user:SuperSecretAdminPass@postgres:5432/warehouse_db
-    - AIRFLOW_CONN_SPARK_DEFAULT=spark://local
+    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN_CMD=bash -c "echo -n postgresql+psycopg2://airflow_user:$(cat /run/secrets/airflow_db_password)@metadata_db/airflow_metadata"
+    - AIRFLOW_CONN_POSTGRES_WAREHOUSE=postgresql://warehouse_admin:warehouse_pass@warehouse_db:5432/data_warehouse
     - AIRFLOW__CORE__LOAD_EXAMPLES=False
-    - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
     - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
   volumes:
     - ./orchestration/dags:/opt/airflow/dags
     - ./src:/opt/airflow/src
+    - ./data:/opt/airflow/data
     - ./jars:/opt/airflow/jars
-    - ./chk:/opt/airflow/chk
     - ./logs:/opt/airflow/logs
+    - ./models:/opt/airflow/models
+    - ./secrets:/opt/airflow/secrets
   depends_on:
-    postgres:
+    metadata_db:
       condition: service_healthy
   networks:
     - data-pipeline-net
-  deploy:
-    resources:
-      limits:
-        cpus: '2.0'
-        memory: 4G
-      reservations:
-        memory: 1G
 
 services:
-  postgres:
+
+  metadata_db:
     image: postgres:15
-    container_name: pizza_postgres
+    container_name: pizza_metadata_db
     restart: always
     secrets:
       - postgres_password
+      - airflow_db_password
     environment:
       POSTGRES_USER: root_admin
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./create_databases.sql:/docker-entrypoint-initdb.d/create_databases.sql
-    ports:
-      - "5432:5432"
+      - metadata_data:/var/lib/postgresql/data
+      - ./init_metadata.sql:/docker-entrypoint-initdb.d/init_metadata.sql
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "root_admin"]
       interval: 10s
       retries: 5
-      start_period: 5s
     networks:
       - data-pipeline-net
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 2G
+
+  warehouse_db:
+    image: postgres:15
+    container_name: pizza_warehouse_db
+    restart: always
+    secrets:
+      - warehouse_password
+    environment:
+      POSTGRES_USER: warehouse_admin
+      POSTGRES_PASSWORD_FILE: /run/secrets/warehouse_password
+      POSTGRES_DB: data_warehouse
+    ports:
+      - "5433:5432"
+    volumes:
+      - warehouse_data:/var/lib/postgresql/data
+      - ./init_warehouse.sql:/docker-entrypoint-initdb.d/init_warehouse.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "warehouse_admin", "-d", "data_warehouse"]
+      interval: 10s
+      retries: 5
+    networks:
+      - data-pipeline-net
 
   airflow-init:
     <<: *airflow-common
     container_name: pizza_airflow_init
-    environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN_CMD=bash -c "echo -n postgresql+psycopg2://airflow_user:$(cat /run/secrets/airflow_db_password)@postgres/airflow_metadata"
-      - _AIRFLOW_DB_UPGRADE=true
-      - _AIRFLOW_WWW_USER_CREATE=true
-      - _AIRFLOW_WWW_USER_USERNAME=admin
-      - _AIRFLOW_WWW_USER_PASSWORD_CMD=bash -c "cat /run/secrets/postgres_password"
-      - _AIRFLOW_WWW_USER_ROLE=Admin
     command: bash -c "airflow db migrate && airflow users create --username admin --password $(cat /run/secrets/postgres_password) --firstname Pizza --lastname Admin --role Admin --email admin@pizza.com"
 
   airflow-webserver:
@@ -110,23 +117,22 @@ services:
       - postgres_password
     environment:
       MB_DB_TYPE: postgres
-      MB_DB_DBNAME: warehouse_db
+      MB_DB_DBNAME: metabase_app_db
       MB_DB_PORT: 5432
-      MB_DB_USER: admin_user
+      MB_DB_USER: root_admin
       MB_DB_PASS_FILE: /run/secrets/postgres_password
-      MB_DB_HOST: postgres
+      MB_DB_HOST: metadata_db
     networks:
       - data-pipeline-net
     depends_on:
-      postgres:
+      metadata_db:
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 2G
+      warehouse_db:
+        condition: service_healthy
 
 volumes:
-  postgres_data:
+  metadata_data:
+  warehouse_data:
 
 networks:
   data-pipeline-net:

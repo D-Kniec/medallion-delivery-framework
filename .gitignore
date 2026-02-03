@@ -1,12 +1,9 @@
-# --- General & OS ---
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
 *.swp
 *.log
-
-# --- Python ---
 __pycache__/
 *.py[cod]
 *$py.class
@@ -20,13 +17,8 @@ dist/
 *.egg-info/
 pytest_cache/
 .pytest_cache/
-
-# --- Secrets (CRITICAL) ---
-# Ignorujemy hasła i tokeny, ale zachowujemy folder
 secrets/*
 !secrets/.gitkeep
-
-# --- Airflow ---
 airflow.cfg
 airflow.db
 unittests.cfg
@@ -35,46 +27,25 @@ airflow-worker.pid
 standalone_admin_password.txt
 logs/*
 !logs/.gitkeep
-
-# --- Apache Spark & checkpoints ---
-# Checkpointy Structured Streaming (stan aplikacji)
 chk/
 data/checkpoints/
 spark-warehouse/
 metastore_db/
 derby.log
 eventLog/
-
-# --- Docker & Infrastructure ---
-# Wolumeny lokalne bazy danych (nie wrzucamy GB danych do gita!)
 postgres_data/
 metabase_data/
-
-# --- Data Lake (Local Storage) ---
-# Nowa struktura: data/ zamiast src/
-
-# 1. Bronze (Raw)
-# Ignorujemy generowane logi JSON (telemetria, zamówienia)
 data/bronze/**/*.json
 data/bronze/**/*.json.checksum
-# Opcjonalnie: Ignorujemy archiwa, ale zachowujemy CSV (dane statyczne jak couriers.csv)
 data/bronze/**/*.zip
 data/bronze/**/*.gz
-
-# 2. Silver (Parquet) - Zawsze ignorujemy, to wynik przetworzenia
 data/silver/*
 !data/silver/.gitkeep
-
-# 3. Gold (jeśli zrzucasz coś lokalnie)
 data/gold/*
 !data/gold/.gitkeep
-
-# Stare ścieżki (dla pewności, żeby nie śmiecić)
 src/bronze/
 src/silver/
 src/gold/
-
-# --- Temporary / Cache ---
 temp/
 tmp/
 .ipynb_checkpoints/

@@ -1,51 +1,80 @@
-# --- BEZPIECZEŃSTWO (Najważniejsze!) ---
-# Ignoruj foldery z hasłami i kluczami
-secrets/
-*.env
-.env.*
-
-# --- DANE I STATUSY (Medallion Architecture) ---
-# Ignorujemy wygenerowane dane w warstwach, ale zostawiamy strukturę folderów
-# Spark Checkpoints (stan streamingu)
-chk/
-checkpoint/
-
-# Warstwa Bronze (surowe dane JSON z generatora)
-src/bronze/*
-!src/bronze/.gitkeep
-
-# Warstwa Silver (przetworzone pliki Parquet i metadane Sparka)
-src/silver/*
-!src/silver/.gitkeep
-
-# Metadane Sparka (często pojawiają się w folderach z danymi)
-_spark_metadata/
-
-# --- LOGI I PLIKI TYMCZASOWE ---
-logs/
+# --- General & OS ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
 *.log
-tmp/
 
-# --- ZALEŻNOŚCI I BINARIA ---
-# Pliki JAR (chyba że chcesz trzymać sterownik Postgresa w repo - wtedy usuń linię poniżej)
-jars/
-*.jar
-
-# --- PYTHON ---
+# --- Python ---
 __pycache__/
 *.py[cod]
 *$py.class
-.venv/
+*.so
+.env
+.venv
 venv/
 env/
+build/
+dist/
+*.egg-info/
+pytest_cache/
+.pytest_cache/
 
-# --- IDE i OS ---
-.idea/
-.vscode/
-.DS_Store
-Thumbs.db
+# --- Secrets (CRITICAL) ---
+# Ignorujemy hasła i tokeny, ale zachowujemy folder
+secrets/*
+!secrets/.gitkeep
 
-# --- DOCKER ---
-# Jeśli montujesz wolumeny lokalnie w folderze projektu (np. dane Postgresa)
+# --- Airflow ---
+airflow.cfg
+airflow.db
+unittests.cfg
+webserver_config.py
+airflow-worker.pid
+standalone_admin_password.txt
+logs/*
+!logs/.gitkeep
+
+# --- Apache Spark & checkpoints ---
+# Checkpointy Structured Streaming (stan aplikacji)
+chk/
+data/checkpoints/
+spark-warehouse/
+metastore_db/
+derby.log
+eventLog/
+
+# --- Docker & Infrastructure ---
+# Wolumeny lokalne bazy danych (nie wrzucamy GB danych do gita!)
 postgres_data/
 metabase_data/
+
+# --- Data Lake (Local Storage) ---
+# Nowa struktura: data/ zamiast src/
+
+# 1. Bronze (Raw)
+# Ignorujemy generowane logi JSON (telemetria, zamówienia)
+data/bronze/**/*.json
+data/bronze/**/*.json.checksum
+# Opcjonalnie: Ignorujemy archiwa, ale zachowujemy CSV (dane statyczne jak couriers.csv)
+data/bronze/**/*.zip
+data/bronze/**/*.gz
+
+# 2. Silver (Parquet) - Zawsze ignorujemy, to wynik przetworzenia
+data/silver/*
+!data/silver/.gitkeep
+
+# 3. Gold (jeśli zrzucasz coś lokalnie)
+data/gold/*
+!data/gold/.gitkeep
+
+# Stare ścieżki (dla pewności, żeby nie śmiecić)
+src/bronze/
+src/silver/
+src/gold/
+
+# --- Temporary / Cache ---
+temp/
+tmp/
+.ipynb_checkpoints/

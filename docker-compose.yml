@@ -10,6 +10,7 @@ x-airflow-common: &airflow-common
   build:
     context: .
     dockerfile: Dockerfile.airflow
+    image: pizza-airflow:latest
   secrets:
     - airflow_db_password
     - postgres_password

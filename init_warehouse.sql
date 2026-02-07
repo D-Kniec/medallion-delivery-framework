@@ -1,0 +1,8 @@
+CREATE SCHEMA IF NOT EXISTS silver;
+CREATE SCHEMA IF NOT EXISTS gold;
+
+CREATE USER metabase_viewer WITH PASSWORD 'metabase_pass';
+GRANT CONNECT ON DATABASE data_warehouse TO metabase_viewer;
+GRANT USAGE ON SCHEMA gold TO metabase_viewer;
+GRANT SELECT ON ALL TABLES IN SCHEMA gold TO metabase_viewer;
+ALTER DEFAULT PRIVILEGES IN SCHEMA gold GRANT SELECT ON TABLES TO metabase_viewer;

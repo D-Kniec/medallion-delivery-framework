@@ -1,0 +1,11 @@
+raw_id,courier_id,first_name,last_name,vehicle_type,vehicle_info,contract_type,active_status,ingested_at,source_system,pizzeria_id,accident_risk_factor,fatigue_resistance,vehicle_range_km,vehicle_ownership,equipment_set,performance_level
+1,C-WAW-01,Jan,Kowalski,bike,Trek District,B2B,active,2026-01-06 10:00:00,HR_System,PIZ-WAW-001,0.02,0.90,40.0,Private,Standard,High
+2,C-WAW-02,Anna,Nowak,car,Skoda Fabia,Full-time,active,2026-01-06 10:00:00,HR_System,PIZ-WAW-001,0.05,0.80,600.0,Company,Pro,Medium
+3,C-WAW-03,Piotr,Zieliński,bike,Giant Escape,B2B,active,2026-01-06 10:00:00,HR_System,PIZ-WAW-001,0.03,0.85,45.0,Private,Standard,High
+4,C-WAW-04,Maria,Wiśniewska,car,Toyota Yaris,B2B,active,2026-01-06 10:00:00,HR_System,PIZ-WAW-001,0.04,0.75,550.0,Company,Standard,Low
+5,C-WAW-05,Kamil,Glik,bike,Specialized Sirrus,Part-time,active,2026-01-06 10:00:00,HR_System,PIZ-WAW-001,0.01,0.95,50.0,Private,Pro,High
+6,C-ROM-01,Alessandro,Rossi,scooter,Vespa Primavera,B2B,active,2026-01-06 10:00:00,HR_System,PIZ-ROM-001,0.10,0.80,150.0,Private,Standard,Medium
+7,C-ROM-02,Giulia,Bianchi,car,Fiat 500,Full-time,active,2026-01-06 10:00:00,HR_System,PIZ-ROM-001,0.06,0.70,400.0,Company,Standard,High
+8,C-ROM-03,Marco,Verdi,bike,Pinarello Lungavita,B2B,active,2026-01-06 10:00:00,HR_System,PIZ-ROM-001,0.02,0.90,60.0,Private,Pro,High
+9,C-ROM-04,Sofia,Russo,car,Alfa Romeo Mito,B2B,active,2026-01-06 10:00:00,HR_System,PIZ-ROM-001,0.08,0.75,500.0,Private,Standard,Medium
+10,C-ROM-05,Luca,Ferrari,bike,Bianchi Spillo,Part-time,active,2026-01-06 10:00:00,HR_System,PIZ-ROM-001,0.03,0.88,55.0,Private,Standard,High

@@ -42,4 +42,4 @@ jobs:
 
     - name: Test Docker Build
       run: |
-        docker build . --file Dockerfile --tag pizza-airflow:test
+        docker build . --file Dockerfile.airflow --tag pizza-airflow:test
